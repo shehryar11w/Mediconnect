@@ -11,10 +11,10 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
 import { useColorScheme } from "../../../hooks/useColorScheme";
-import { createGlobalStyles } from "../../theme/styles";
+import { createGlobalStyles } from "../../../theme/styles";
 
 type DoctorProfile = {
     id: string;
@@ -50,7 +50,7 @@ const EditProfileScreen = () => {
             try {
                 setIsLoading(true);
                 const res = await detailsService.getDoctorDetails(
-                    currentUser?.id
+                    currentUser?.id,
                 );
                 setProfile({
                     id: res.data.id,
@@ -77,37 +77,37 @@ const EditProfileScreen = () => {
         try {
             // Validate required fields
             if (!profile.name?.trim()) {
-                Alert.alert('Error', 'Name is required');
+                Alert.alert("Error", "Name is required");
                 return;
             }
 
             if (!profile.email?.trim()) {
-                Alert.alert('Error', 'Email is required');
+                Alert.alert("Error", "Email is required");
                 return;
             }
 
             // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(profile.email)) {
-                Alert.alert('Error', 'Please enter a valid email address');
+                Alert.alert("Error", "Please enter a valid email address");
                 return;
             }
 
             // Validate phone number
             if (!profile.phone?.trim()) {
-                Alert.alert('Error', 'Phone number is required');
+                Alert.alert("Error", "Phone number is required");
                 return;
             }
 
             const phoneRegex = /^\+?[0-9]{10,14}$/;
-            if (!phoneRegex.test(profile.phone.replace(/\s/g, ''))) {
-                Alert.alert('Error', 'Please enter a valid phone number');
+            if (!phoneRegex.test(profile.phone.replace(/\s/g, ""))) {
+                Alert.alert("Error", "Please enter a valid phone number");
                 return;
             }
 
             // Validate specialization
             if (!profile.specialization?.trim()) {
-                Alert.alert('Error', 'Specialization is required');
+                Alert.alert("Error", "Specialization is required");
                 return;
             }
 
@@ -115,15 +115,25 @@ const EditProfileScreen = () => {
             if (profile.education.length > 0) {
                 for (let i = 0; i < profile.education.length; i++) {
                     const edu = profile.education[i];
-                    if (!edu.degree?.trim() || !edu.institution?.trim() || !edu.year?.trim()) {
-                        Alert.alert('Error', `Please complete all fields for education entry ${i + 1}`);
+                    if (
+                        !edu.degree?.trim() ||
+                        !edu.institution?.trim() ||
+                        !edu.year?.trim()
+                    ) {
+                        Alert.alert(
+                            "Error",
+                            `Please complete all fields for education entry ${i + 1}`,
+                        );
                         return;
                     }
 
                     // Validate year format
                     const yearRegex = /^\d{4}$/;
                     if (!yearRegex.test(edu.year)) {
-                        Alert.alert('Error', `Please enter a valid year for education entry ${i + 1}`);
+                        Alert.alert(
+                            "Error",
+                            `Please enter a valid year for education entry ${i + 1}`,
+                        );
                         return;
                     }
                 }
@@ -134,19 +144,19 @@ const EditProfileScreen = () => {
                 DoctorName: profile.name.trim(),
                 DoctorEmail: profile.email.trim(),
                 DoctorPhone: profile.phone.trim(),
-                DoctorAddress: profile.address?.trim() || '',
+                DoctorAddress: profile.address?.trim() || "",
                 DoctorSpecialization: profile.specialization.trim(),
                 DoctorEducation: profile.education,
             };
 
             await detailsService.updateDoctorDetails(
                 currentUser?.id,
-                updatedData
+                updatedData,
             );
             router.back();
         } catch (error) {
             console.error("Error updating profile:", error);
-            Alert.alert('Error', 'Failed to update profile. Please try again.');
+            Alert.alert("Error", "Failed to update profile. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -174,7 +184,7 @@ const EditProfileScreen = () => {
     const updateEducation = (
         index: number,
         field: keyof DoctorProfile["education"][0],
-        value: string
+        value: string,
     ) => {
         const newEducation = [...profile.education];
         newEducation[index] = {
@@ -232,24 +242,21 @@ const EditProfileScreen = () => {
             {/* Profile Image */}
             <View style={styles.section}>
                 <View style={styles.avatarContainer}>
-                            
-                        <View
+                    <View
+                        style={[
+                            styles.avatar,
+                            { backgroundColor: colors.doctorPrimary + "20" },
+                        ]}
+                    >
+                        <ThemedText
                             style={[
-                                styles.avatar,
-                                { backgroundColor: colors.doctorPrimary + "20" },
+                                styles.avatarText,
+                                { color: colors.doctorPrimary },
                             ]}
                         >
-                            <ThemedText
-                                style={[
-                                    styles.avatarText,
-                                    { color: colors.doctorPrimary },
-                                ]}
-                            >
-                                {profile.name.charAt(0)}
-                            </ThemedText>
-                        </View>
-                    
-                    
+                            {profile.name.charAt(0)}
+                        </ThemedText>
+                    </View>
                 </View>
             </View>
 

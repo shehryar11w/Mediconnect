@@ -39,6 +39,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
 mongoose.connect(config.MONGODB_URI, {
+  
   useNewUrlParser: true,
   useUnifiedTopology: true,
   autoIndex: process.env.NODE_ENV !== 'production',

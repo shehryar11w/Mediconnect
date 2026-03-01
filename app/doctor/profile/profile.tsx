@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { useColorScheme } from "../../../hooks/useColorScheme";
-import { createGlobalStyles } from "../../theme/styles";
+import { createGlobalStyles } from "../../../theme/styles";
 
 const ProfileScreen = () => {
     const { colors, isDark, setThemeMode } = useColorScheme();
@@ -51,7 +51,7 @@ const ProfileScreen = () => {
     });
     const [showTimeModal, setShowTimeModal] = useState(false);
     const [selectedTimeType, setSelectedTimeType] = useState<"start" | "end">(
-        "start"
+        "start",
     );
     const [unavailableDates, setUnavailableDates] = useState<{
         [key: string]: {
@@ -85,14 +85,15 @@ const ProfileScreen = () => {
                 .map(([day]) => day),
             DoctorWorkingHours: workingHours,
             DoctorUnavailableDays: Object.keys(unavailableDates).filter(
-                (day) => unavailableDates[day as keyof typeof unavailableDates]
-                    .selected
+                (day) =>
+                    unavailableDates[day as keyof typeof unavailableDates]
+                        .selected,
             ),
         };
         console.log(updatedData);
         const res = await detailsService.updateDoctorDetails(
             currentUser?.id,
-            updatedData
+            updatedData,
         );
         console.log(res);
     };
@@ -102,7 +103,7 @@ const ProfileScreen = () => {
             try {
                 setIsLoading(true);
                 const res = await detailsService.getDoctorDetails(
-                    currentUser?.id
+                    currentUser?.id,
                 );
                 setDoctorDetails(res.data);
                 setBaseRate(res.data.details.DoctorBaseRate);
@@ -140,7 +141,7 @@ const ProfileScreen = () => {
                                 };
                                 return acc;
                             },
-                            {}
+                            {},
                         );
                     setUnavailableDates(markedDates);
                 } else {
@@ -243,7 +244,11 @@ const ProfileScreen = () => {
     const renderInfoItem = (icon: string, label: string, value: string) => (
         <View style={[styles.infoItem, { backgroundColor: colors.background }]}>
             <View style={styles.infoIcon}>
-                <Ionicons name={icon as any} size={24} color={colors.doctorPrimary} />
+                <Ionicons
+                    name={icon as any}
+                    size={24}
+                    color={colors.doctorPrimary}
+                />
             </View>
             <View style={styles.infoContent}>
                 <ThemedText
@@ -327,7 +332,9 @@ const ProfileScreen = () => {
                                 { color: colors.doctorPrimary },
                             ]}
                         >
-                            {doctorDetails.basicInfo.name.charAt(4)}
+                            {doctorDetails.basicInfo.name
+                                .charAt(4)
+                                .toUpperCase()}
                         </ThemedText>
                     </View>
                     <ThemedText style={styles.name}>
@@ -417,7 +424,8 @@ const ProfileScreen = () => {
                                             {
                                                 backgroundColor: isSelected
                                                     ? colors.doctorPrimary
-                                                    : colors.doctorPrimary + "20",
+                                                    : colors.doctorPrimary +
+                                                      "20",
                                             },
                                         ]}
                                         onPress={() =>
@@ -443,7 +451,7 @@ const ProfileScreen = () => {
                                                 day.slice(1, 3)}
                                         </ThemedText>
                                     </TouchableOpacity>
-                                )
+                                ),
                             )}
                         </View>
                     </View>
@@ -464,7 +472,10 @@ const ProfileScreen = () => {
                             <TouchableOpacity
                                 style={[
                                     styles.timeButton,
-                                    { backgroundColor: colors.doctorPrimary + "20" },
+                                    {
+                                        backgroundColor:
+                                            colors.doctorPrimary + "20",
+                                    },
                                 ]}
                                 onPress={() => handleTimeSelect("start")}
                             >
@@ -488,7 +499,10 @@ const ProfileScreen = () => {
                             <TouchableOpacity
                                 style={[
                                     styles.timeButton,
-                                    { backgroundColor: colors.doctorPrimary + "20" },
+                                    {
+                                        backgroundColor:
+                                            colors.doctorPrimary + "20",
+                                    },
                                 ]}
                                 onPress={() => handleTimeSelect("end")}
                             >
@@ -523,7 +537,8 @@ const ProfileScreen = () => {
                                 backgroundColor: colors.background,
                                 calendarBackground: colors.background,
                                 textSectionTitleColor: colors.text,
-                                selectedDayBackgroundColor: colors.doctorPrimary,
+                                selectedDayBackgroundColor:
+                                    colors.doctorPrimary,
                                 selectedDayTextColor: colors.background,
                                 todayTextColor: colors.doctorPrimary,
                                 dayTextColor: colors.text,
@@ -602,17 +617,17 @@ const ProfileScreen = () => {
                     {renderInfoItem(
                         "mail",
                         "Email",
-                        doctorDetails.basicInfo.email
+                        doctorDetails.basicInfo.email,
                     )}
                     {renderInfoItem(
                         "call",
                         "Phone",
-                        doctorDetails.basicInfo.phone
+                        doctorDetails.basicInfo.phone,
                     )}
                     {renderInfoItem(
                         "location",
                         "Address",
-                        doctorDetails.details.DoctorAddress
+                        doctorDetails.details.DoctorAddress,
                     )}
                 </View>
 
@@ -654,7 +669,7 @@ const ProfileScreen = () => {
                                         {edu.institution}
                                     </ThemedText>
                                 </View>
-                            )
+                            ),
                         )}
                 </View>
 
@@ -708,7 +723,7 @@ const ProfileScreen = () => {
                                     value={getTimeFromString(
                                         selectedTimeType === "start"
                                             ? workingHours.start
-                                            : workingHours.end
+                                            : workingHours.end,
                                     )}
                                     mode="time"
                                     display="spinner"
@@ -728,7 +743,7 @@ const ProfileScreen = () => {
                                     value={getTimeFromString(
                                         selectedTimeType === "start"
                                             ? workingHours.start
-                                            : workingHours.end
+                                            : workingHours.end,
                                     )}
                                     mode="time"
                                     display="spinner"
@@ -769,7 +784,10 @@ const ProfileScreen = () => {
                                 <TouchableOpacity
                                     style={[
                                         styles.modalButton,
-                                        { backgroundColor: colors.doctorPrimary },
+                                        {
+                                            backgroundColor:
+                                                colors.doctorPrimary,
+                                        },
                                     ]}
                                     onPress={() => setShowTimeModal(false)}
                                 >

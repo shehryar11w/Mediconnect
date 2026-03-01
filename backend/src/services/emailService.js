@@ -1,56 +1,58 @@
-const { google } = require('googleapis');
-const nodemailer = require('nodemailer');
-const path = require('path');
+const { google } = require("googleapis");
+const nodemailer = require("nodemailer");
+const path = require("path");
 
 class EmailService {
-  constructor() {
-    // Load credentials from service account JSON file
-    const credentials = require(path.join(process.cwd(), 'src/services/credentials.json'));
-    
-    this.oauth2Client = new google.auth.OAuth2(
-      credentials.installed.client_id,
-      credentials.installed.client_secret,
-      credentials.installed.redirect_uris[0]
-    );
+    constructor() {
+        // Load credentials from service account JSON file
+        const credentials = require(
+            path.join(process.cwd(), "src/services/credentials.json"),
+        );
 
-    this.oauth2Client.setCredentials({
-      refresh_token: credentials.installed.refresh_token
-    });
+        this.oauth2Client = new google.auth.OAuth2(
+            credentials.installed.client_id,
+            credentials.installed.client_secret,
+            credentials.installed.redirect_uris[0],
+        );
 
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        type: 'OAuth2',
-        user: process.env.GMAIL_USER,
-        clientId: credentials.installed.client_id,
-        clientSecret: credentials.installed.client_secret,
-        refreshToken: credentials.installed.refresh_token,
-        accessToken: this.oauth2Client.getAccessToken()
-      }
-    });
-  }
+        this.oauth2Client.setCredentials({
+            refresh_token: credentials.installed.refresh_token,
+        });
 
-  async sendEmail(to, subject, html) {
-    try {
-      const mailOptions = {
-        from: process.env.GMAIL_USER,
-        to,
-        subject,
-        html
-      };
-
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log('Email sent:', info.messageId);
-      return info;
-    } catch (error) {
-      console.error('Error sending email:', error);
-      throw error;
+        this.transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                type: "OAuth2",
+                user: process.env.GMAIL_USER,
+                clientId: credentials.installed.client_id,
+                clientSecret: credentials.installed.client_secret,
+                refreshToken: credentials.installed.refresh_token,
+                accessToken: this.oauth2Client.getAccessToken(),
+            },
+        });
     }
-  }
 
-  async sendNewAppointmentEmail(appointment, patient, doctor) {
-    const patientSubject = 'New Appointment Confirmation';
-    const patientHtml = `
+    async sendEmail(to, subject, html) {
+        try {
+            const mailOptions = {
+                from: process.env.GMAIL_USER,
+                to,
+                subject,
+                html,
+            };
+
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log("Email sent:", info.messageId);
+            return info;
+        } catch (error) {
+            console.error("Error sending email:", error);
+            throw error;
+        }
+    }
+
+    async sendNewAppointmentEmail(appointment, patient, doctor) {
+        const patientSubject = "New Appointment Confirmation";
+        const patientHtml = `
       <h2>Appointment Confirmation</h2>
       <p>Dear ${patient.PatientName},</p>
       <p>Your appointment with Dr. ${doctor.DoctorName} has been scheduled for:</p>
@@ -61,8 +63,8 @@ class EmailService {
       <p>Best regards,<br>Medi-Connect Team</p>
     `;
 
-    const doctorSubject = 'New Appointment Request';
-    const doctorHtml = `
+        const doctorSubject = "New Appointment Request";
+        const doctorHtml = `
       <h2>New Appointment Request</h2>
       <p>Dear Dr. ${doctor.DoctorName},</p>
       <p>You have a new appointment request from ${patient.PatientName}:</p>
@@ -72,15 +74,15 @@ class EmailService {
       <p>Best regards,<br>Medi-Connect Team</p>
     `;
 
-    await Promise.all([
-      this.sendEmail(patient.PatientEmail, patientSubject, patientHtml),
-      this.sendEmail(doctor.DoctorEmail, doctorSubject, doctorHtml)
-    ]);
-  }
+        await Promise.all([
+            this.sendEmail(patient.PatientEmail, patientSubject, patientHtml),
+            this.sendEmail(doctor.DoctorEmail, doctorSubject, doctorHtml),
+        ]);
+    }
 
-  async sendRescheduledAppointmentEmail(appointment, patient, doctor) {
-    const patientSubject = 'Appointment Rescheduled';
-    const patientHtml = `
+    async sendRescheduledAppointmentEmail(appointment, patient, doctor) {
+        const patientSubject = "Appointment Rescheduled";
+        const patientHtml = `
       <h2>Appointment Rescheduled</h2>
       <p>Dear ${patient.PatientName},</p>
       <p>Your appointment with Dr. ${doctor.DoctorName} has been rescheduled to:</p>
@@ -91,8 +93,8 @@ class EmailService {
       <p>Best regards,<br>Medi-Connect Team</p>
     `;
 
-    const doctorSubject = 'Appointment Rescheduled';
-    const doctorHtml = `
+        const doctorSubject = "Appointment Rescheduled";
+        const doctorHtml = `
       <h2>Appointment Rescheduled</h2>
       <p>Dear Dr. ${doctor.DoctorName},</p>
       <p>The appointment with ${patient.PatientName} has been rescheduled to:</p>
@@ -102,15 +104,15 @@ class EmailService {
       <p>Best regards,<br>Medi-Connect Team</p>
     `;
 
-    await Promise.all([
-      this.sendEmail(patient.PatientEmail, patientSubject, patientHtml),
-      this.sendEmail(doctor.DoctorEmail, doctorSubject, doctorHtml)
-    ]);
-  }
+        await Promise.all([
+            this.sendEmail(patient.PatientEmail, patientSubject, patientHtml),
+            this.sendEmail(doctor.DoctorEmail, doctorSubject, doctorHtml),
+        ]);
+    }
 
-  async sendCancelledAppointmentEmail(appointment, patient, doctor) {
-    const patientSubject = 'Appointment Cancelled';
-    const patientHtml = `
+    async sendCancelledAppointmentEmail(appointment, patient, doctor) {
+        const patientSubject = "Appointment Cancelled";
+        const patientHtml = `
       <h2>Appointment Cancelled</h2>
       <p>Dear ${patient.PatientName},</p>
       <p>Your appointment with Dr. ${doctor.DoctorName} has been cancelled.</p>
@@ -118,8 +120,8 @@ class EmailService {
       <p>Best regards,<br>Medi-Connect Team</p>
     `;
 
-    const doctorSubject = 'Appointment Cancelled';
-    const doctorHtml = `
+        const doctorSubject = "Appointment Cancelled";
+        const doctorHtml = `
       <h2>Appointment Cancelled</h2>
       <p>Dear Dr. ${doctor.DoctorName},</p>
       <p>The appointment with ${patient.PatientName} has been cancelled.</p>
@@ -127,15 +129,15 @@ class EmailService {
       <p>Best regards,<br>Medi-Connect Team</p>
     `;
 
-    await Promise.all([
-      this.sendEmail(patient.PatientEmail, patientSubject, patientHtml),
-      this.sendEmail(doctor.DoctorEmail, doctorSubject, doctorHtml)
-    ]);
-  }
+        await Promise.all([
+            this.sendEmail(patient.PatientEmail, patientSubject, patientHtml),
+            this.sendEmail(doctor.DoctorEmail, doctorSubject, doctorHtml),
+        ]);
+    }
 
-  async sendCompletedAppointmentEmail(appointment, patient, doctor) {
-    const subject = 'Appointment Completed - Feedback Requested';
-    const html = `
+    async sendCompletedAppointmentEmail(appointment, patient, doctor) {
+        const subject = "Appointment Completed - Feedback Requested";
+        const html = `
       <h2>Appointment Completed</h2>
       <p>Dear ${patient.PatientName},</p>
       <p>Your appointment with Dr. ${doctor.DoctorName} has been completed.</p>
@@ -144,12 +146,12 @@ class EmailService {
       <p>Best regards,<br>Medi-Connect Team</p>
     `;
 
-    await this.sendEmail(patient.PatientEmail, subject, html);
-  }
+        await this.sendEmail(patient.PatientEmail, subject, html);
+    }
 
-  async sendPasswordResetEmail(email, token) {
-    const subject = 'Password Reset Request';
-    const html = `
+    async sendPasswordResetEmail(email, token) {
+        const subject = "Password Reset Request";
+        const html = `
       <h2>Password Reset Request</h2>
       <p>Dear ${email},</p>
       <p>You have requested a password reset. Please use the code below to reset your password:</p>
@@ -159,8 +161,8 @@ class EmailService {
       <p>Best regards,<br>Medi-Connect Team</p>
     `;
 
-    await this.sendEmail(email, subject, html);
-  }
+        await this.sendEmail(email, subject, html);
+    }
 }
 
 module.exports = new EmailService();
